@@ -1,0 +1,11 @@
+../Core/Src/CLCD_I2C.c:21:13:CLCD_WriteI2C	32	static
+../Core/Src/CLCD_I2C.c:54:6:CLCD_I2C_Init	8	static
+../Core/Src/CLCD_I2C.c:85:6:CLCD_I2C_SetCursor	0	static
+../Core/Src/CLCD_I2C.c:114:6:CLCD_I2C_WriteChar	0	static
+../Core/Src/CLCD_I2C.c:118:6:CLCD_I2C_WriteString	16	static
+../Core/Src/CLCD_I2C.c:122:6:CLCD_I2C_Clear	8	static
+../Core/Src/CLCD_I2C.c:127:6:CLCD_I2C_ReturnHome	8	static
+../Core/Src/CLCD_I2C.c:132:6:CLCD_I2C_CursorOn	0	static
+../Core/Src/CLCD_I2C.c:137:6:CLCD_I2C_CursorOff	0	static
+../Core/Src/CLCD_I2C.c:142:6:CLCD_I2C_BlinkOn	0	static
+../Core/Src/CLCD_I2C.c:147:6:CLCD_I2C_BlinkOff	0	static

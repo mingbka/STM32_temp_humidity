@@ -140,6 +140,7 @@ __weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 	HAL_UART_Receive_IT(&huart1, rxData, sizeof(rxData) - 1);
   }
+}
 /* USER CODE END 0 */
 
 /**
@@ -175,7 +176,10 @@ int main(void)
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  CLCD_I2C_Init(&LCD1, &hi2c2, 0X4e, 20, 4);
+  CLCD_I2C_SetCursor(&LCD1,0,0);
+  CLCD_I2C_WriteString(&LCD1,"Start");
+  HAL_UART_Receive_IT(&huart1, rxData, sizeof(rxData) - 1);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -321,7 +325,6 @@ static void MX_I2C2_Init(void)
   /* USER CODE END I2C2_Init 0 */
 
   /* USER CODE BEGIN I2C2_Init 1 */
-
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
   hi2c2.Init.ClockSpeed = 100000;
@@ -408,10 +411,30 @@ static void MX_GPIO_Init(void)
 void measure_task(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  /* Infinite loop */
+	/* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	a++;
+	start_time_SHTC3 = HAL_GetTick();
+	uint16_t hex_ther;
+	uint16_t hex_moisture;
+	HAL_I2C_Master_Transmit(&hi2c1,SHTC3_ADDRESS, wakeup_cmd ,2, 500);
+	HAL_Delay(1);
+	HAL_I2C_Master_Transmit(&hi2c1,SHTC3_ADDRESS, measure_cmd ,2, 500);
+	HAL_Delay(15);
+	HAL_I2C_Master_Receive(&hi2c1,SHTC3_ADDRESS, rev_buffer ,6,500);
+	HAL_I2C_Master_Transmit(&hi2c1,SHTC3_ADDRESS, sleep_cmd ,2, 500);
+	hex_ther = (rev_buffer[0]<<8)|rev_buffer[1];
+	hex_moisture = (rev_buffer[3]<<8)|rev_buffer[4];
+	if (osSemaphoreAcquire(bin_semHandle, osWaitForever) == osOK) {
+		temperature = -45.0f + 175.0f * (float)hex_ther / 65535.0f;
+		humidity = 100.0f * (float)hex_moisture / 65535.0f;
+		// Release Semaphore
+		osSemaphoreRelease(bin_semHandle);
+	}
+	end_time_SHTC3 = HAL_GetTick();
+	elapsed_time_SHTC3 = -(start_time_SHTC3 - end_time_SHTC3);
+	osDelayUntil(start_time_SHTC3+250);
   }
   /* USER CODE END 5 */
 }
@@ -429,7 +452,7 @@ void write_clcd_task(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	b++;
+	c++;
 	start_time_CLCD = HAL_GetTick();
 	char lcd_line1[17];
 	char lcd_line2[17];
@@ -457,7 +480,7 @@ void write_clcd_task(void *argument)
 	CLCD_I2C_WriteString(&LCD1,lcd_line2);
 	end_time_CLCD = HAL_GetTick();
 	elapsed_time_CLCD = -(start_time_CLCD - end_time_CLCD);
-	osDelayUntil(start_time_CLCD+1000);
+	osDelayUntil(start_time_CLCD+5000);
   }
   /* USER CODE END write_clcd_task */
 }
@@ -475,7 +498,7 @@ void send_uart_task(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	c++;
+	b++;
 	start_time_UART = HAL_GetTick();
 	if (osSemaphoreAcquire(bin_semHandle, osWaitForever) == osOK) {
 	char data[64];
@@ -488,7 +511,7 @@ void send_uart_task(void *argument)
 	end_time_UART = HAL_GetTick();
 	elapsed_time_UART = -(start_time_UART - end_time_UART);
 	osDelayUntil(start_time_UART+1000);
-  }
+	}
   /* USER CODE END send_uart_task */
 }
 
@@ -509,7 +532,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
   /* USER CODE END Callback 1 */
 }
 
@@ -540,7 +562,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

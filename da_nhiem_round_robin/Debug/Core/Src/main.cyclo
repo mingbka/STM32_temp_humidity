@@ -6,7 +6,7 @@
 ../Core/Src/main.c:362:13:MX_USART1_UART_Init	2
 ../Core/Src/main.c:395:13:MX_GPIO_Init	1
 ../Core/Src/main.c:420:6:measure_task	2
-../Core/Src/main.c:458:6:write_clcd_task	6
-../Core/Src/main.c:504:6:send_uart_task	2
-../Core/Src/main.c:535:6:HAL_TIM_PeriodElapsedCallback	2
-../Core/Src/main.c:551:6:Error_Handler	1
+../Core/Src/main.c:461:6:write_clcd_task	6
+../Core/Src/main.c:510:6:send_uart_task	2
+../Core/Src/main.c:544:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:560:6:Error_Handler	1

@@ -17,7 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "main.h"//round robin
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -421,9 +421,11 @@ void measure_task(void *argument)
 {
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
+	TickType_t previousWakeTime = xTaskGetTickCount();
   for(;;)
   {
 	a++;
+
 	start_time_SHTC3 = HAL_GetTick();
 	uint16_t hex_ther;
 	uint16_t hex_moisture;
@@ -443,7 +445,8 @@ void measure_task(void *argument)
 	}
 	end_time_SHTC3 = HAL_GetTick();
 	elapsed_time_SHTC3 = -(start_time_SHTC3 - end_time_SHTC3);
-	osDelay(250);
+	vTaskDelayUntil(&previousWakeTime, pdMS_TO_TICKS(250));
+	//osDelay(250);
   }
   /* USER CODE END 5 */
 }
@@ -459,9 +462,11 @@ void write_clcd_task(void *argument)
 {
   /* USER CODE BEGIN write_clcd_task */
   /* Infinite loop */
+	TickType_t previousWakeTime = xTaskGetTickCount();
   for(;;)
   {
 	c++;
+
 	start_time_CLCD = HAL_GetTick();
 	char lcd_line1[17];
 	char lcd_line2[17];
@@ -489,7 +494,8 @@ void write_clcd_task(void *argument)
 	CLCD_I2C_WriteString(&LCD1,lcd_line2);
 	end_time_CLCD = HAL_GetTick();
 	elapsed_time_CLCD = -(start_time_CLCD - end_time_CLCD);
-	osDelay(5000);
+	vTaskDelayUntil(&previousWakeTime, pdMS_TO_TICKS(5000));
+	//osDelay(5000);
   }
   /* USER CODE END write_clcd_task */
 }
@@ -505,9 +511,11 @@ void send_uart_task(void *argument)
 {
   /* USER CODE BEGIN send_uart_task */
   /* Infinite loop */
+	TickType_t previousWakeTime = xTaskGetTickCount();
   for(;;)
   {
 	b++;
+
 	start_time_UART = HAL_GetTick();
 	if (osSemaphoreAcquire(bin_semHandle, osWaitForever) == osOK) {
 	char data[64];
@@ -519,7 +527,8 @@ void send_uart_task(void *argument)
 	}
 	end_time_UART = HAL_GetTick();
 	elapsed_time_UART = -(start_time_UART - end_time_UART);
-	osDelay(1000);
+	vTaskDelayUntil(&previousWakeTime, pdMS_TO_TICKS(1000));
+	//osDelay(1000);
 	}
   /* USER CODE END send_uart_task */
 }
